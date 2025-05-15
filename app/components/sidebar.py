@@ -1,0 +1,31 @@
+import reflex as rx
+from app.states.gpta_state import GptaState, ORGANS_LIST
+
+
+def sidebar() -> rx.Component:
+    return rx.el.aside(
+        rx.el.h2(
+            "Organes du GPTA",
+            class_name="text-lg font-semibold text-gray-100 mb-4 px-4 pt-4",
+        ),
+        rx.el.nav(
+            rx.foreach(
+                ORGANS_LIST,
+                lambda organ: rx.el.button(
+                    organ["name"],
+                    on_click=lambda: GptaState.select_organ(
+                        organ["id"]
+                    ),
+                    class_name=rx.cond(
+                        GptaState.selected_organ_id
+                        == organ["id"],
+                        "w-full text-left px-4 py-2.5 text-sm text-white bg-indigo-700 hover:bg-indigo-600 transition-colors duration-150",
+                        "w-full text-left px-4 py-2.5 text-sm text-gray-300 hover:bg-indigo-700 hover:text-white transition-colors duration-150",
+                    ),
+                    width="100%",
+                ),
+            ),
+            class_name="flex flex-col space-y-1",
+        ),
+        class_name="w-64 bg-indigo-900 text-white h-screen fixed top-0 left-0 shadow-lg pt-16",
+    )

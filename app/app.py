@@ -1,30 +1,34 @@
 import reflex as rx
 from app.states.gpta_state import GptaState
-from app.components.organ_selector import organ_selector
-from app.components.organ_detail_card import (
-    organ_detail_card,
-)
+from app.components.sidebar import sidebar
+from app.components.main_content import main_content_area
 
 
 def index() -> rx.Component:
     return rx.el.div(
         rx.el.header(
-            rx.el.h1(
-                "Dashboard de Performance du Système GPTA",
-                class_name="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600 py-4 text-center",
-            ),
-            class_name="bg-white shadow-md mb-6",
-        ),
-        rx.el.main(
             rx.el.div(
-                organ_selector(),
-                organ_detail_card(),
-                class_name="max-w-6xl mx-auto p-4 space-y-6",
-            )
+                rx.el.h1(
+                    "Dashboard Technique Interactif – GPTA",
+                    class_name="text-2xl font-bold text-white",
+                ),
+                class_name="container mx-auto px-4 py-4 flex items-center justify-between",
+            ),
+            class_name="bg-indigo-800 shadow-md fixed top-0 left-0 right-0 z-50 h-16",
         ),
-        class_name="min-h-screen bg-gradient-to-br from-gray-100 via-gray-50 to-indigo-100",
+        rx.el.div(
+            sidebar(),
+            main_content_area(),
+            class_name="flex flex-row",
+        ),
+        class_name="font-sans antialiased text-gray-900 bg-gray-100",
     )
 
 
-app = rx.App(theme=rx.theme(appearance="light"))
+app = rx.App(
+    theme=rx.theme(appearance="light"),
+    stylesheets=[
+        "https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css"
+    ],
+)
 app.add_page(index)
