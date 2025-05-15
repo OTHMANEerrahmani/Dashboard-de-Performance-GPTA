@@ -1,0 +1,23 @@
+
+/* Tailwind CSS Directives */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom styles can be added here */
+body {
+    font-family: 'Inter', sans-serif; /* Example: Using Inter font */
+}
+
+.sidebar-button {
+    @apply w-full text-left px-4 py-2.5 rounded-md transition-colors duration-150 ease-in-out;
+}
+
+.sidebar-button-active {
+    @apply bg-indigo-700 text-white shadow-md;
+}
+
+.sidebar-button-inactive {
+    @apply text-indigo-100 hover:bg-indigo-800 hover:text-white;
+}
+

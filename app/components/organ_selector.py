@@ -1,5 +1,9 @@
 import reflex as rx
-from app.states.gpta_state import GptaState
+from app.states.gpta_state import GptaState, OrganData
+
+
+def _render_organ_option(organ: OrganData) -> rx.Component:
+    return rx.el.option(organ["name"], value=organ["id"])
 
 
 def organ_selector() -> rx.Component:
@@ -13,10 +17,7 @@ def organ_selector() -> rx.Component:
                 "--- Choisir un organe ---", value=""
             ),
             rx.foreach(
-                GptaState.organs,
-                lambda organ: rx.el.option(
-                    organ["name"], value=organ["id"]
-                ),
+                GptaState.organs, _render_organ_option
             ),
             value=GptaState.selected_organ_id,
             on_change=GptaState.select_organ,

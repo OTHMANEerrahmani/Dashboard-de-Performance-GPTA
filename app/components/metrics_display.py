@@ -16,12 +16,12 @@ def metric_item(
                 class_name="text-lg font-semibold text-indigo-700",
             ),
             rx.cond(
-                unit,
+                unit != "",
                 rx.el.span(
                     f" {unit}",
                     class_name="text-sm text-gray-600",
                 ),
-                "",
+                rx.fragment(),
             ),
             class_name="mt-1",
         ),
@@ -32,9 +32,9 @@ def metric_item(
 def input_item(
     label: str,
     state_var: rx.Var,
-    on_change_event: rx.EventChain,
+    on_change_event: rx.event.EventHandler,
     placeholder: str,
-    type: str = "text",
+    input_type: str = "text",
 ) -> rx.Component:
     return rx.el.div(
         rx.el.label(
@@ -45,7 +45,7 @@ def input_item(
             default_value=state_var,
             on_change=on_change_event,
             placeholder=placeholder,
-            type=type,
+            type=input_type,
             class_name="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm",
         ),
         class_name="col-span-1",
@@ -106,37 +106,39 @@ def metrics_display() -> rx.Component:
             ),
             metric_item(
                 "Taux de défaillance (λ)",
-                GptaState.lambda_rate,
+                GptaState.lambda_rate_display,
             ),
             metric_item(
                 "Disponibilité (A)",
-                GptaState.availability_display_str,
+                GptaState.availability_display,
             ),
             class_name="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4",
         ),
         rx.el.div(
             input_item(
                 "Temps 't' pour R(t) (heures):",
-                GptaState.user_input_t_str,
-                GptaState.set_user_input_t_str,
+                GptaState.t_slider_value,
+                GptaState.set_t_slider_value,
                 "e.g., 1000",
+                input_type="number",
             ),
             metric_item(
                 "Fiabilité R(t)",
-                GptaState.reliability_rt_display_str,
+                GptaState.reliability_rt_display,
             ),
             class_name="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4 p-4 border border-gray-200 rounded-lg",
         ),
         rx.el.div(
             input_item(
-                "Fiabilité cible R0 pour Périodicité:",
-                GptaState.user_input_r0_str,
-                GptaState.set_user_input_r0_str,
-                "e.g., 0.9",
+                "Fiabilité cible R0 pour Périodicité (%):",
+                GptaState.r0_slider_value,
+                GptaState.set_r0_slider_value,
+                "e.g., 90",
+                input_type="number",
             ),
             metric_item(
                 "Périodicité Préventive Opt.",
-                GptaState.preventive_periodicity,
+                GptaState.preventive_periodicity_display,
                 "heures",
             ),
             class_name="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 border border-gray-200 rounded-lg",

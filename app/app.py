@@ -1,5 +1,4 @@
 import reflex as rx
-from app.states.gpta_state import GptaState
 from app.components.sidebar import sidebar
 from app.components.main_content import main_content_area
 
@@ -27,8 +26,6 @@ def index() -> rx.Component:
 
 app = rx.App(
     theme=rx.theme(appearance="light"),
-    stylesheets=[
-        "https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css"
-    ],
+    stylesheets=["/style.css"],
 )
 app.add_page(index)

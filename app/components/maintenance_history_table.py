@@ -1,5 +1,40 @@
 import reflex as rx
-from app.states.gpta_state import GptaState
+from app.states.gpta_state import (
+    GptaState,
+    MaintenanceInterventionData,
+)
+
+
+def _render_intervention_row(
+    item: MaintenanceInterventionData,
+) -> rx.Component:
+    return rx.el.tr(
+        rx.el.td(
+            item["date"],
+            class_name="px-3 py-2 whitespace-nowrap text-sm text-gray-600",
+        ),
+        rx.el.td(
+            item["type"],
+            class_name=rx.cond(
+                item["type"] == "Corrective",
+                "px-3 py-2 whitespace-nowrap text-sm text-red-600 font-medium",
+                "px-3 py-2 whitespace-nowrap text-sm text-gray-600",
+            ),
+        ),
+        rx.el.td(
+            item["duration_h"].to_string(),
+            class_name="px-3 py-2 whitespace-nowrap text-sm text-gray-600 text-center",
+        ),
+        rx.el.td(
+            item["action"],
+            class_name="px-3 py-2 text-sm text-gray-600",
+        ),
+        rx.el.td(
+            item["remarks"],
+            class_name="px-3 py-2 text-sm text-gray-600",
+        ),
+        class_name="border-b border-gray-200 hover:bg-gray-50",
+    )
 
 
 def maintenance_history_table_component() -> rx.Component:
@@ -41,36 +76,7 @@ def maintenance_history_table_component() -> rx.Component:
                 rx.el.tbody(
                     rx.foreach(
                         GptaState.current_organ_interventions,
-                        lambda item: rx.el.tr(
-                            rx.el.td(
-                                item["date"],
-                                class_name="px-3 py-2 whitespace-nowrap text-sm text-gray-600",
-                            ),
-                            rx.el.td(
-                                item["type"],
-                                class_name=rx.cond(
-                                    item["type"]
-                                    == "Corrective",
-                                    "px-3 py-2 whitespace-nowrap text-sm text-red-600 font-medium",
-                                    "px-3 py-2 whitespace-nowrap text-sm text-gray-600",
-                                ),
-                            ),
-                            rx.el.td(
-                                item[
-                                    "duration_h"
-                                ].to_string(),
-                                class_name="px-3 py-2 whitespace-nowrap text-sm text-gray-600 text-center",
-                            ),
-                            rx.el.td(
-                                item["action"],
-                                class_name="px-3 py-2 text-sm text-gray-600",
-                            ),
-                            rx.el.td(
-                                item["remarks"],
-                                class_name="px-3 py-2 text-sm text-gray-600",
-                            ),
-                            class_name="border-b border-gray-200 hover:bg-gray-50",
-                        ),
+                        _render_intervention_row,
                     ),
                     rx.cond(
                         GptaState.current_organ_interventions.length()

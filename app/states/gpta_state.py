@@ -1,5 +1,9 @@
 import reflex as rx
-from typing import TypedDict, List, Optional
+from typing import (
+    TypedDict,
+    List,
+    Optional as TypingOptional,
+)
 from datetime import datetime, timezone
 import math
 
@@ -163,12 +167,12 @@ class GptaState(rx.State):
     r0_slider_value: int = 88
 
     @rx.var
-    def selected_organ(self) -> Optional[OrganData]:
+    def selected_organ(self) -> TypingOptional[OrganData]:
         if not self.selected_organ_id:
             return None
-        for organ in self.organs:
-            if organ["id"] == self.selected_organ_id:
-                return organ
+        for organ_item in self.organs:
+            if organ_item["id"] == self.selected_organ_id:
+                return organ_item
         return None
 
     @rx.var
@@ -255,17 +259,24 @@ class GptaState(rx.State):
     @rx.var
     def mtbf(self) -> str:
         if self.num_failures == 0:
-            return "N/A"
+            total_op_hours = (
+                self.organ_total_operating_hours
+            )
+            return (
+                f"{total_op_hours:.2f}"
+                if total_op_hours > 0
+                else "N/A (pas de pannes)"
+            )
         total_op_hours = self.organ_total_operating_hours
         if total_op_hours <= 0:
-            return "N/A"
+            return "N/A (données TBF insuffisantes)"
         val = total_op_hours / self.num_failures
         return f"{val:.2f}"
 
     @rx.var
     def mttr(self) -> str:
         if self.num_failures == 0:
-            return "N/A"
+            return "N/A (pas d'interventions correctives)"
         val = (
             self.total_corrective_repair_duration_hours
             / self.num_failures
@@ -273,7 +284,7 @@ class GptaState(rx.State):
         return f"{val:.2f}"
 
     @rx.var
-    def lambda_rate_value(self) -> Optional[float]:
+    def lambda_rate_value(self) -> TypingOptional[float]:
         mtbf_str = self.mtbf
         try:
             mtbf_val = float(mtbf_str)
@@ -291,19 +302,25 @@ class GptaState(rx.State):
         return f"{val:.5f}"
 
     @rx.var
-    def availability_value(self) -> Optional[float]:
+    def availability_value(self) -> TypingOptional[float]:
         mtbf_str = self.mtbf
         mttr_str = self.mttr
         try:
             mtbf_val = float(mtbf_str)
-            mttr_val = float(mttr_str)
-            if mtbf_val + mttr_val == 0:
+            mttr_val = 0.0
+            if self.num_failures > 0:
+                mttr_val = float(mttr_str)
+            if mtbf_val < 0 or mttr_val < 0:
+                return None
+            if mtbf_val == 0 and mttr_val == 0:
                 if (
                     self.num_failures == 0
                     and self.organ_total_operating_hours > 0
                 ):
                     return 1.0
                 return None
+            if mtbf_val + mttr_val == 0:
+                return 0.0 if self.num_failures > 0 else 1.0
             return mtbf_val / (mtbf_val + mttr_val)
         except ValueError:
             if (
@@ -321,42 +338,36 @@ class GptaState(rx.State):
         return f"{val * 100:.2f}%"
 
     @rx.var
-    def user_input_t(self) -> int:
-        return self.t_slider_value
-
-    @rx.var
-    def user_input_r0(self) -> float:
-        return self.r0_slider_value / 100.0
-
-    @rx.var
-    def reliability_rt_value(self) -> Optional[float]:
+    def reliability_rt_value(self) -> TypingOptional[float]:
         lambda_val = self.lambda_rate_value
-        if lambda_val is None or lambda_val < 0:
+        if lambda_val is None:
             if (
                 self.num_failures == 0
                 and self.organ_total_operating_hours > 0
             ):
                 return 1.0
             return None
-        t = self.user_input_t
+        if lambda_val < 0:
+            return None
+        t = self.t_slider_value
         try:
             return math.exp(-lambda_val * t)
         except OverflowError:
-            return None
+            return 0.0
 
     @rx.var
     def reliability_rt_display(self) -> str:
         val = self.reliability_rt_value
         if val is None:
             return "N/A"
-        return f"{val:.2f}"
+        return f"{val:.3f}"
 
     @rx.var
     def preventive_periodicity_value(
         self,
-    ) -> Optional[float]:
+    ) -> TypingOptional[float]:
         lambda_val = self.lambda_rate_value
-        r0 = self.user_input_r0
+        r0 = self.r0_slider_value / 100.0
         if lambda_val is None or lambda_val <= 0:
             return None
         if not 0 < r0 < 1:

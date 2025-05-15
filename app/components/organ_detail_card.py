@@ -1,7 +1,7 @@
 import reflex as rx
 from app.states.gpta_state import GptaState
 from app.components.maintenance_history_table import (
-    maintenance_history_table,
+    maintenance_history_table_component,
 )
 from app.components.metrics_display import metrics_display
 
@@ -27,7 +27,7 @@ def organ_detail_card() -> rx.Component:
                     class_name="w-full h-48 object-contain rounded-lg shadow-md mb-6 bg-gray-100 p-2",
                 ),
                 metrics_display(),
-                maintenance_history_table(),
+                maintenance_history_table_component(),
                 class_name="p-6 bg-white rounded-xl shadow-xl",
             ),
             rx.el.div(

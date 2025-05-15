@@ -53,12 +53,12 @@ def _slider_component(
         ),
         rx.el.input(
             type="range",
-            min=min_val,
-            max=max_val,
+            min_=min_val,
+            max_=max_val,
             step=step,
             on_change=on_change_event,
             class_name="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-indigo-600",
-            default_value=slider_value_state.to_string(),
+            default_value=slider_value_state,
         ),
         rx.el.div(
             rx.el.span(
