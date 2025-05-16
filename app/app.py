@@ -1,9 +1,10 @@
 import reflex as rx
 from app.components.sidebar import sidebar
 from app.components.main_content import main_content_area
+from app.pages.home import home as home_page_func
 
 
-def index() -> rx.Component:
+def dashboard_page() -> rx.Component:
     return rx.el.div(
         rx.el.header(
             rx.el.div(
@@ -28,4 +29,5 @@ app = rx.App(
     theme=rx.theme(appearance="light"),
     stylesheets=["/style.css"],
 )
-app.add_page(index)
+app.add_page(dashboard_page, route="/")
+app.add_page(home_page_func, route="/home")
